@@ -1,0 +1,64 @@
+version: "3.9"
+
+services:
+  db-us:
+    image: postgres:14-alpine
+    environment:
+      POSTGRES_DB: products
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./data/us:/var/lib/postgresql/data
+      - ./seeds:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d products"]
+      interval: 5s
+      retries: 5
+
+  db-eu:
+    image: postgres:14-alpine
+    environment:
+      POSTGRES_DB: products
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5433:5432"
+    volumes:
+      - ./data/eu:/var/lib/postgresql/data
+      - ./seeds:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d products"]
+      interval: 5s
+      retries: 5
+
+  db-apac:
+    image: postgres:14-alpine
+    environment:
+      POSTGRES_DB: products
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5434:5432"
+    volumes:
+      - ./data/apac:/var/lib/postgresql/data
+      - ./seeds:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d products"]
+      interval: 5s
+      retries: 5
+
+  minio:
+    image: minio/minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: admin
+      MINIO_ROOT_PASSWORD: password123
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000"]
+      interval: 5s
+      retries: 5
